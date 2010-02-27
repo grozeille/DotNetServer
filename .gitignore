@@ -1,0 +1,11 @@
+
+/Application
+*.resharper.user
+*.suo
+_ReSharper*
+/MyBundle/obj
+/TestWebApp/obj
+/TestWebApp/*.user
+/TestWebApp/bin
+/DotNetServer/obj
+/DotNetServerApi/obj
