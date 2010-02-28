@@ -3,25 +3,48 @@ using System.Collections.Generic;
 using System.Text;
 using DotNetServerApi;
 using System.Threading;
+using MyBundleContacts;
+using NDesk.DBus;
+using org.freedesktop.DBus;
 
 namespace MyBundle
 {
-    public class MyActivator : IActivator
+    public class MyActivator : IActivator, IMyService
     {
         public void Start()
         {
-            Console.WriteLine("Started");
-            for (int i = 0; i < 10; i++)
+            var bus = Bus.Open("tcp:host=localhost,port=12345");
+            //var bus = Bus.Open("win:path=dbus-session");
+
+            string bus_name = "org.mathias.test";
+            ObjectPath path = new ObjectPath("/org/mathias/test");
+
+            IMyService service;
+
+            if (bus.RequestName(bus_name) == RequestNameReply.PrimaryOwner)
             {
-                //Console.WriteLine("{0}...",i);
-                Thread.Sleep(1000);
+                //create a new instance of the object to be exported
+                service = new MyActivator();
+                bus.Register(path, service);
+
+                //run the main loop
+                while (true)
+                    bus.Iterate();
             }
-            //throw new Exception("Haha");
         }
 
         public void Stop()
         {
             Console.WriteLine("Stopped");
         }
+
+        #region IMyService Members
+
+        public string Say(Person prs)
+        {
+            return string.Format("Hello {0}", prs.Name);
+        }
+
+        #endregion
     }
 }

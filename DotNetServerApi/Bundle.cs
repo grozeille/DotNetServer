@@ -7,9 +7,17 @@ namespace DotNetServerApi
     {
         public Type Activator { get; set; }
 
+        public string[] Depends { get; set; }
+
         public BundleAttribute(Type activator)
         {
             this.Activator = activator;
+        }
+
+        public BundleAttribute(Type activator, params string[] depends)
+        {
+            this.Activator = activator;
+            this.Depends = depends;
         }
     }
 }

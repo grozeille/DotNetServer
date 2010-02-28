@@ -1,11 +1,10 @@
 
-/Application
+/Application/*.*
+/Application/Bundles
+/Application/Work
+/Application/Libs/DotNetServerApi.*
+/Application/Contracts
 *.resharper.user
 *.suo
 _ReSharper*
-/MyBundle/obj
-/TestWebApp/obj
-/TestWebApp/*.user
-/TestWebApp/bin
-/DotNetServer/obj
-/DotNetServerApi/obj
+*.userprefs

@@ -1,17 +1,15 @@
 ﻿using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using DotNetServerApi;
-using MyBundle;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("MyBundle")]
+[assembly: AssemblyTitle("MyBundleContacts")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Microsoft")]
-[assembly: AssemblyProduct("MyBundle")]
+[assembly: AssemblyProduct("MyBundleContacts")]
 [assembly: AssemblyCopyright("Copyright © Microsoft 2010")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -22,7 +20,7 @@ using MyBundle;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("9bc9f5e2-914e-49ba-b5b9-7f1bad94c113")]
+[assembly: Guid("e1f795f9-83e7-4567-9254-9c32b025b247")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -36,5 +34,3 @@ using MyBundle;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
-
-[assembly: Bundle(typeof(MyActivator), "DBusBundle")]

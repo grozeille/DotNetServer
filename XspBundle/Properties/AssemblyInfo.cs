@@ -2,16 +2,16 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using DotNetServerApi;
-using MyBundle;
+using XspBundle;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("MyBundle")]
+[assembly: AssemblyTitle("XspBundle")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Microsoft")]
-[assembly: AssemblyProduct("MyBundle")]
+[assembly: AssemblyProduct("XspBundle")]
 [assembly: AssemblyCopyright("Copyright © Microsoft 2010")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -22,7 +22,7 @@ using MyBundle;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("9bc9f5e2-914e-49ba-b5b9-7f1bad94c113")]
+[assembly: Guid("6540a9c7-0a32-46bb-8f4e-3e0456dbc454")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -37,4 +37,4 @@ using MyBundle;
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
 
-[assembly: Bundle(typeof(MyActivator), "DBusBundle")]
+[assembly: Bundle(typeof(XspActivator))]
