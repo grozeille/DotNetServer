@@ -35,6 +35,16 @@ namespace XspBundle
             //this.webAppServer.AddApplication(Dns.GetHostName(), Port, "/TestWebApp2", path);*/
 
             this.webAppServer.Start(true);
+            /*
+            // Start another instance?
+            Port = 1487;
+            this.websource = new XSPWebSource(IPAddress.Any, Port);
+            this.webAppServer = new ApplicationServer(this.websource);
+            path = "Work\\TestWebApp2";
+            cmdLine = Port + ":/:" + path;
+            this.webAppServer.AddApplicationsFromCommandLine(cmdLine);
+            this.webAppServer.Start(true);*/
+
             Console.WriteLine("Mono.WebServer running");
         }
 
