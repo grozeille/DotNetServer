@@ -8,8 +8,8 @@
     <ProjectGuid>{C9B3A0CD-5D7E-4D33-83E3-F1E1261FE4E3}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MyBundleContacts</RootNamespace>
-    <AssemblyName>MyBundleContacts</AssemblyName>
+    <RootNamespace>MyBundle.Contracts</RootNamespace>
+    <AssemblyName>MyBundle.Contracts</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

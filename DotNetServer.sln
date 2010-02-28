@@ -28,7 +28,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyAnotherBundle", "MyAnothe
 		{C9B3A0CD-5D7E-4D33-83E3-F1E1261FE4E3} = {C9B3A0CD-5D7E-4D33-83E3-F1E1261FE4E3}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyBundleContacts", "MyBundleContacts\MyBundleContacts.csproj", "{C9B3A0CD-5D7E-4D33-83E3-F1E1261FE4E3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyBundle.Contracts", "MyBundle.Contracts\MyBundle.Contracts.csproj", "{C9B3A0CD-5D7E-4D33-83E3-F1E1261FE4E3}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Bundles", "Bundles", "{76028674-AD3F-45A0-943D-5D4BD6B0BC05}"
 EndProject

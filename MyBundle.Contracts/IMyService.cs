@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using NDesk.DBus;
 
-namespace MyBundleContacts
+namespace MyBundle.Contracts
 {
     [Interface("org.mathias.myservice")]
     public interface IMyService

@@ -3,7 +3,7 @@
 /Application/Bundles
 /Application/Work
 /Application/Libs/DotNetServerApi.*
-/Application/Libs/Contracts
+/Application/Libs/Contracts/*.*
 *.resharper.user
 *.suo
 _ReSharper*

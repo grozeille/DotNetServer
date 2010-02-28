@@ -57,9 +57,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MyBundleContacts\MyBundleContacts.csproj">
+    <ProjectReference Include="..\MyBundle.Contracts\MyBundle.Contracts.csproj">
       <Project>{C9B3A0CD-5D7E-4D33-83E3-F1E1261FE4E3}</Project>
-      <Name>MyBundleContacts</Name>
+      <Name>MyBundle.Contracts</Name>
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
