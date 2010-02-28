@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using DotNetServerApi;
-using MyBundleContacts;
+using MyBundle.Contracts;
 using NDesk.DBus;
 
 namespace MyAnotherBundle

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using DotNetServerApi;
 using System.Threading;
-using MyBundleContacts;
+using MyBundle.Contracts;
 using NDesk.DBus;
 using org.freedesktop.DBus;
 

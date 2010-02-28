@@ -28,7 +28,7 @@ namespace XspBundle
             //this.webAppServer.AddApplication(Dns.GetHostName(), Port, "/TestWebApp", path);
             
 
-            path = "Work\\TestWebApp";
+            path = "Work\\TestWebApp2";
             //"[[hostname:]port:]VPath:realpath"
             cmdLine = Port + ":/TestWebApp2/:" + path;
             this.webAppServer.AddApplicationsFromCommandLine(cmdLine);

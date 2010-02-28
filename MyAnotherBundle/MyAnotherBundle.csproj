@@ -36,9 +36,9 @@
       <HintPath>..\Application\Libs\DotNetServerApi.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="MyBundleContacts, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="MyBundle.Contracts, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Application\Libs\Contracts\MyBundleContacts.dll</HintPath>
+      <HintPath>..\Application\Libs\Contracts\MyBundle.Contracts.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="NDesk.DBus, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
