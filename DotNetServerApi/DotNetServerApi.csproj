@@ -31,18 +31,36 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Common.Logging, Version=2.0.0.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Application\Libs\Common.Logging\Common.Logging.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Activator.cs" />
-    <Compile Include="Bundle.cs" />
+    <Compile Include="BundleActivator.cs" />
+    <Compile Include="Configuration\BundleConfigurationSection.cs" />
+    <Compile Include="IBundleActivator.cs" />
+    <Compile Include="BundleActivatorAttribute.cs" />
+    <Compile Include="BundleContext.cs" />
     <Compile Include="BundleController.cs" />
+    <Compile Include="BundleDependencyAttribute.cs" />
+    <Compile Include="BundleDependencyInfo.cs" />
+    <Compile Include="BundleEventArgs.cs" />
     <Compile Include="BundleInfo.cs" />
+    <Compile Include="BundleState.cs" />
+    <Compile Include="Exceptions\BundleIsBeingUninstalledException.cs" />
+    <Compile Include="Exceptions\BundleNotFoundException.cs" />
+    <Compile Include="IBundleContext.cs" />
+    <Compile Include="Exceptions\InvalidBundleVersionException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

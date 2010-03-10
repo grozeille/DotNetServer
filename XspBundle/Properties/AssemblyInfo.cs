@@ -37,4 +37,5 @@ using XspBundle;
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
 
-[assembly: Bundle(typeof(XspActivator))]
+[assembly: BundleActivator(typeof(XspActivator))]
+[assembly: BundleDependency("DBusBundle", "1.0.0.0")]

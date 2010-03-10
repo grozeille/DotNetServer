@@ -1,17 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using DotNetServerApi;
-using System.Threading;
 using MyBundle.Contracts;
 using NDesk.DBus;
 using org.freedesktop.DBus;
 
 namespace MyBundle
 {
-    public class MyActivator : IActivator, IMyService
+    public class MyActivator : BundleActivator, IMyService
     {
-        public void Start()
+        protected override void OnStart()
         {
             var bus = Bus.Open("tcp:host=localhost,port=12345");
             //var bus = Bus.Open("win:path=dbus-session");
@@ -33,7 +30,7 @@ namespace MyBundle
             }
         }
 
-        public void Stop()
+        protected override void OnStop()
         {
             Console.WriteLine("Stopped");
         }

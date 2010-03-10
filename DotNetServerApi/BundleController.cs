@@ -1,19 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading;
-using DotNetServerApi;
+using System.Web.Configuration;
+using Common.Logging;
+using DotNetServerApi.Configuration;
+using DotNetServerApi.Exceptions;
 
 namespace DotNetServerApi
 {
     public class BundleController : MarshalByRefObject
     {
-        private IActivator instance;
+        private static ILog logger = LogManager.GetLogger(typeof (BundleController));
 
-        public IActivator CurrentActivator
+        private IBundleActivator instance;
+
+        public IBundleActivator CurrentActivator
         {
             get
             {
@@ -21,129 +26,220 @@ namespace DotNetServerApi
             }
         }
 
-        public void StartActivator()
+        public void StartActivator(IBundleContext context)
         {
             var path = AppDomain.CurrentDomain.SetupInformation.ApplicationName;            
             var name = AssemblyName.GetAssemblyName(path);
-            var assembly = AppDomain.CurrentDomain.Load(name);
-            var attribute = (BundleAttribute)assembly.GetCustomAttributes(typeof(BundleAttribute), false).FirstOrDefault();
+
+            context.ChangeBundleState(name.Name, BundleState.Starting);
+
+            // load the assembly in the AppDomain
+            var assembly = AppDomain.CurrentDomain.Load(name);           
+
+            // get the meta-data of the bundle
+            var activatorAttribute = (BundleActivatorAttribute)assembly.GetCustomAttributes(typeof(BundleActivatorAttribute), false).FirstOrDefault();
+            var dependencyAttributes = assembly.GetCustomAttributes(typeof(BundleDependencyAttribute), false).Cast<BundleDependencyAttribute>();
 
             // if there's some dependencies, load them
-            if(attribute.Depends != null)
+            if (dependencyAttributes != null)
             {
-                foreach(string bundle in attribute.Depends)
+                foreach (var bundle in dependencyAttributes)
                 {
-                    if(!applicationLoaded.ContainsKey(bundle))
+                    var existingBundle = context.GetBundle(bundle.Name);
+                    if (existingBundle == null)
+                    {                        
+                        throw new BundleNotFoundException(bundle.Name, bundle.Version);                       
+                    }
+                    else
                     {
-                        Console.WriteLine("Loading dependency: {0}", bundle);
-                        BundleController.Start(bundle);
+                        if (existingBundle.Version != bundle.Version)
+                        {
+                            throw new InvalidBundleVersionException(bundle.Name, bundle.Version, existingBundle.Version);
+                        }
+                        else if (existingBundle.State == BundleState.Installed)
+                        {
+                            BundleController.Start(context, bundle.Name);
+                        }
+                        else if (existingBundle.State == BundleState.Resolved)
+                        {
+                            BundleController.Start(context, bundle.Name);
+                        }
+                        else if (existingBundle.State == BundleState.Starting)
+                        {
+                            BundleController.WaitFor(context, bundle.Name, BundleState.Active);
+                        }
+                        else if (existingBundle.State == BundleState.Stopping)
+                        {
+                            BundleController.WaitFor(context, bundle.Name, BundleState.Resolved);
+                            BundleController.Start(context, bundle.Name);
+                        }
+                        else if (existingBundle.State == BundleState.Uninstalled)
+                            throw new BundleIsBeingUninstalledException(existingBundle.Name, existingBundle.Version);
+
+                        logger.InfoFormat("Loading dependency: {0}", bundle);
                     }
                 }
             }
 
-            var activatorType = Type.GetType(attribute.Activator.AssemblyQualifiedName);
+            // create a new instance of the activator
+            var activatorType = Type.GetType(activatorAttribute.Activator.AssemblyQualifiedName);
             var ctor = activatorType.GetConstructor(new Type[0]);
-            this.instance = (IActivator)ctor.Invoke(new object[0]);
+            this.instance = (IBundleActivator)ctor.Invoke(new object[0]);
+            
+            // start the bundle
+            ThreadPool.QueueUserWorkItem(new WaitCallback((o) => ((IBundleActivator)o).Start()), this.instance);
 
-            ThreadPool.QueueUserWorkItem(new WaitCallback((o) => ((IActivator)o).Start()), this.instance);
+            context.ChangeBundleState(name.Name, BundleState.Active);
         }
 
-        public void StopActivator()
+        private static void WaitFor(IBundleContext context, string bundleName, BundleState bundleState)
         {
-            lock (this.instance)
-            {
-                this.instance.Stop();
-            }
+            while(context.GetBundle(bundleName).State != bundleState)
+                Thread.Sleep(1000);
         }
 
-        private static IDictionary<string, BundleInfo> applicationLoaded = new Dictionary<string, BundleInfo>();
-
-        public static IDictionary<string, BundleInfo> ApplicationLoaded
+        public void StopActivator(IBundleContext context)
         {
-            get
-            {
-                IDictionary<string, BundleInfo> clone = new Dictionary<string, BundleInfo>();
-                foreach(var item in applicationLoaded)
-                    clone.Add(item.Key, item.Value);
-                return clone;                
-            }
+            this.instance.Stop();
         }
 
-        public static void Stop(string assemblyName)
+        public static void Stop(IBundleContext context, string bundleName)
         {
-            if (!applicationLoaded.ContainsKey(assemblyName))
+            var bundle = context.GetBundle(bundleName);
+            if (bundle == null)
             {
-                Console.WriteLine("Application {0} not loaded", assemblyName);
+                logger.InfoFormat("Application {0} not loaded", bundleName);
                 return;
             }
-
-            //applicationLoaded[assemblyName].DoCallBack(Stop);
-            applicationLoaded[assemblyName].Boostrap.StopActivator();
-            AppDomain.Unload(applicationLoaded[assemblyName].AppDomain);
-            applicationLoaded.Remove(assemblyName);
+            context.ChangeBundleState(bundle.Name, BundleState.Stopping);
+            bundle.Boostrap.StopActivator(context);
+            context.ChangeBundleState(bundle.Name, BundleState.Resolved);
+            AppDomain.Unload(bundle.AppDomain);
         }
 
-        public static void Start(string assemblyName)
+        public static void Start(IBundleContext context, string bundleName)
         {
-            if (applicationLoaded.ContainsKey(assemblyName))
+            // load all installed bundle
+            RefreshAllBundles(context);
+
+            // TODO : handle installation of new bundle?
+            var bundleInfo = context.GetBundle(bundleName);
+            if(bundleInfo == null)
+                throw new BundleNotFoundException(bundleName, null);
+
+            if (bundleInfo.State == BundleState.Active)
             {
-                Console.WriteLine("Application {0} already loaded", assemblyName);
+                logger.InfoFormat("Application {0} already loaded", bundleName);
                 return;
             }
-
-            string path = Path.GetFullPath(string.Format("Bundles\\{0}\\{0}.dll", assemblyName));
 
             AppDomainSetup setup = AppDomain.CurrentDomain.SetupInformation;
             setup.ApplicationBase = AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
-            ApplicationIdentity identity = new ApplicationIdentity(AssemblyName.GetAssemblyName(path).Name);
+            ApplicationIdentity identity = new ApplicationIdentity(bundleInfo.Name);
             //setup.ActivationArguments = new ActivationArguments(identity, new string[] { p });
-            setup.ApplicationName = path;
+            setup.ApplicationName = bundleInfo.Path;
 
             setup.AppDomainInitializer = null;
             //setup.AppDomainInitializer = new AppDomainInitializer(Initialize);
             //setup.AppDomainInitializerArguments = new string[]{ path };
 
             List<string> paths = new List<string>();
-            paths.Add(Path.GetDirectoryName(path));
+            paths.Add(Path.GetDirectoryName(bundleInfo.Path));
             paths.Add(Path.Combine(setup.ApplicationBase, "Libs"));
             paths.AddRange(Directory.GetDirectories(Path.Combine(setup.ApplicationBase, "Libs")));
             setup.PrivateBinPath = string.Join(";", paths.ToArray());
 
-            var dom = AppDomain.CreateDomain(path, AppDomain.CurrentDomain.Evidence, setup);
+            var dom = AppDomain.CreateDomain(bundleInfo.Path, AppDomain.CurrentDomain.Evidence, setup);
 
-            //dom.AssemblyResolve += new ResolveEventHandler(dom_AssemblyResolve);
-            //dom.ReflectionOnlyAssemblyResolve += new ResolveEventHandler(dom_AssemblyResolve);
-
-            //Console.WriteLine(string.Join(Environment.NewLine, dom.GetAssemblies().Select(a => a.FullName).ToArray()));
-            /*
-            var tmp = dom.CreateInstance(AssemblyName.GetAssemblyName(p).Name, "MyBundle.MyActivator");
-            ((IActivator) tmp.Unwrap()).Start();*/
             dom.ProcessExit += new EventHandler(dom_ProcessExit);
             dom.DomainUnload += new EventHandler(dom_DomainUnload);
             dom.UnhandledException += new UnhandledExceptionEventHandler(dom_UnhandledException);
 
-            BundleController boot = (BundleController)dom.CreateInstanceAndUnwrap(typeof(BundleController).Assembly.FullName, typeof(BundleController).FullName);
+            bundleInfo.Boostrap = (BundleController)dom.CreateInstanceAndUnwrap(typeof(BundleController).Assembly.FullName, typeof(BundleController).FullName);
+            bundleInfo.AppDomain = dom;
+            
+            bundleInfo.State = BundleState.Resolved;
+            context.RegisterBundle(bundleInfo);
 
-            applicationLoaded.Add(assemblyName, new BundleInfo { AppDomain = dom, Boostrap = boot });
+            bundleInfo.Boostrap.StartActivator(context);
+        }
 
-            boot.StartActivator();
+        public static void RefreshAllBundles(IBundleContext context)
+        {
+            // parse each folders to register new bundles
+            foreach (var folderPath in Directory.GetDirectories(Path.GetFullPath(string.Format("Bundles"))))
+            {
+                var bundleName = new DirectoryInfo(folderPath).Name;
+                var bundleInfo = context.GetBundle(bundleName);
+                if (bundleInfo == null)
+                {
+                    string path = Path.GetFullPath(string.Format("Bundles\\{0}\\{0}.dll", bundleName));
 
-            //dom.DoCallBack(Start);            
+                    // the assembly doesn't exist, try the bundle.config? Web.config?
+                    if (!File.Exists(path))
+                    {
+                        System.Configuration.Configuration configuration = null;
+
+                        if (File.Exists(Path.GetFullPath(string.Format("Bundles\\{0}\\{0}.dll.config", bundleName))))
+                        {
+                            configuration = ConfigurationManager.OpenExeConfiguration(path);
+                        }
+                        else if (File.Exists(Path.GetFullPath(string.Format("Bundles\\{0}\\web.config", bundleName))))
+                        {
+                            VirtualDirectoryMapping vdm =
+                                new VirtualDirectoryMapping(
+                                    Path.GetFullPath(string.Format("Bundles\\{0}", bundleName)), true);
+                            WebConfigurationFileMap wcfm = new WebConfigurationFileMap();
+                            wcfm.VirtualDirectories.Add("/", vdm);
+
+                            // Get the Web application configuration object.
+                            configuration = WebConfigurationManager.OpenMappedWebConfiguration(wcfm, "/");
+                        }
+                        else
+                        {
+                            throw new BundleNotFoundException(bundleName, new Version());
+                        }
+
+                        // TODO : better error handling
+                        var section = (BundleConfigurationSection) configuration.GetSection("bundleConfiguration");
+
+                        path = Path.GetFullPath(string.Format("Bundles\\{0}\\{1}", bundleName, section.BundlePath));
+                        if (!File.Exists(path))
+                            throw new BundleNotFoundException(bundleName, new Version());
+                    }
+                   
+                    // create the bundle with all information needed
+                    var assembly = Assembly.ReflectionOnlyLoadFrom(path);
+                    var version = assembly.GetName().Version;
+                    bundleInfo = new BundleInfo
+                    {
+                        Path = path,
+                        Name = bundleName,
+                        Version = assembly.GetName().Version,
+                        State = BundleState.Installed
+                    };
+
+                    // and then, register it
+                    context.RegisterBundle(bundleInfo);
+                }
+            }
         }
 
         static void dom_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-
+            logger.Fatal("Unhandled exception", e.ExceptionObject as Exception);
         }
 
         static void dom_DomainUnload(object sender, EventArgs e)
         {
+            logger.InfoFormat("Unloading domain {0}", sender);
             var unload = ((AppDomain)sender);
+            // TODO : change state to "resolved"
         }
 
         static void dom_ProcessExit(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            logger.InfoFormat("Exiting process {0}", sender);
         }
-    }
+    }    
 }

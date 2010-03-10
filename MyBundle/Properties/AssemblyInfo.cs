@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using DotNetServerApi;
@@ -37,4 +38,5 @@ using MyBundle;
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
 
-[assembly: Bundle(typeof(MyActivator), "DBusBundle")]
+[assembly: BundleActivator(typeof(MyActivator))]
+[assembly: BundleDependency("DBusBundle", "1.0.0.0")]

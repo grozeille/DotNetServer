@@ -37,4 +37,4 @@ using DBusBundle;
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
 
-[assembly: Bundle(typeof(DBusActivator))]
+[assembly: BundleActivator(typeof(DBusActivator))]

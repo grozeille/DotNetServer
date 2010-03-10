@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using DotNetServerApi;
 using MyBundle.Contracts;
@@ -8,13 +6,13 @@ using NDesk.DBus;
 
 namespace MyAnotherBundle
 {
-    public class MyAnotherActivator : IActivator
+    public class MyAnotherActivator : BundleActivator
     {
         #region IActivator Members
 
         private bool running;
 
-        public void Start()
+        protected override void OnStart()
         {
             var bus = Bus.Open("tcp:host=localhost,port=12345");
             //var bus = Bus.Open("win:path=dbus-session");
@@ -32,7 +30,7 @@ namespace MyAnotherBundle
             }
         }
 
-        public void Stop()
+        protected override void OnStop()
         {
             running = false;
         }

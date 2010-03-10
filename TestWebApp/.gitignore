@@ -1,7 +1,0 @@
-
-*.pidb
-obj
-*.user
-*.userprefs
-_ReSharper*
-bin

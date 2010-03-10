@@ -1,24 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using DotNetServerApi;
-using NDesk.DBus;
+using System.Threading;
 
 namespace DBusBundle
 {
-    public class DBusActivator : IActivator
+    public class DBusActivator : BundleActivator
     {
-        #region IActivator Members
-
-        public void Start()
-        {
+        protected override void OnStart()
+        {          
             DBusDaemon.RunServer("tcp:host=localhost,port=12345");
         }
 
-        public void Stop()
+        protected override void OnStop()
         {
+        
         }
-
-        #endregion
     }
 }

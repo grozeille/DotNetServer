@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace TestWebApp {
+namespace WebAspBundle {
     
     
     public partial class _Default {

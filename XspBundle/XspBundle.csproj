@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -31,9 +31,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Mono.WebServer, Version=0.1.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756">
+    <Reference Include="Mono.WebServer2, Version=0.2.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\Application\Libs\Mono\Mono.WebServer.dll</HintPath>
+      <HintPath>..\Application\Libs\Mono\Mono.WebServer2.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="NDesk.DBus, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Application\Libs\NDesk.DBus\NDesk.DBus.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
@@ -47,9 +52,14 @@
       <HintPath>..\Application\Libs\Common.Logging\Common.Logging.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="DotNetServerApi">
+    <Reference Include="DotNetServerApi, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Application\Libs\DotNetServerApi.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="XspBundle.Contracts, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Application\Libs\Contracts\XspBundle.Contracts.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>

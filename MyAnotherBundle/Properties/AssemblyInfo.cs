@@ -37,4 +37,6 @@ using MyAnotherBundle;
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
 
-[assembly: Bundle(typeof(MyAnotherActivator), "MyBundle")]
+[assembly: BundleActivator(typeof(MyAnotherActivator))]
+[assembly: BundleDependency("MyBundle", "1.0.0.0")]
+[assembly: BundleDependency("DBusBundle", "1.0.0.0")]
